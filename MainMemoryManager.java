@@ -32,19 +32,18 @@ public class MainMemoryManager
 
 		int counter = 0;
 		int currentIndex = index - 1;
-		if(currentIndex >= 0 && mainMemory[currentIndex] == 0)
+
+		//combine left
+		if(currentIndex >= 0 && mainMemory[currentIndex] <= 0)
 		{
+			//combine with empty tags
 			while(mainMemory[currentIndex] == 0)
 			{
 				currentIndex -= 1;
 				counter++;
 			}
-		}
 
-		//combine left
-		if(currentIndex >= 0 && mainMemory[currentIndex] < 0)
-		{
-			counter += 1;
+			counter++;
 			int toMove = mainMemory[currentIndex] * -1 + 1;
 			mainMemory[currentIndex] = 0;
 			currentIndex -= toMove;
@@ -55,17 +54,34 @@ public class MainMemoryManager
 		}
 
 		//combine right
-		if(currentIndex < mainMemory.length)
+		if(currentIndex == mainMemory.length - 1)
+			mainMemory[currentIndex] = counter;
+		else
 		{
-			if(currentIndex == mainMemory.length - 1)
-				mainMemory[currentIndex] = counter;
+			currentIndex++;
+
+			//combine with empty tags
+			while(mainMemory[currentIndex] == 0)
+			{
+				currentIndex++;
+				counter++;
+			}
+
+			if(mainMemory[currentIndex] < 0)
+			{
+				counter++;
+				int toMove = mainMemory[currentIndex] * -1 + 1;
+				mainMemory[currentIndex] = 0;
+				currentIndex += toMove;
+				counter += toMove;
+			}
 			else
 			{
-				if()
-				{
-					
-				}
+				currentIndex--;
+				counter--;
 			}
+
+			mainMemory[currentIndex] = counter;
 		}
 	}
 
