@@ -12,6 +12,13 @@ public class MainMemoryManager
 	public int mm_init(int mem_size)
 	{
 		mainMemory = new int[mem_size];
+		if(mem_size > 2)
+		{
+			int initialHole = (mem_size - 2) * -1;
+			mainMemory[0] = initialHole;
+			mainMemory[mem_size - 1] = initialHole;
+		}
+		
 		return mem_size;
 	}
 
@@ -32,11 +39,10 @@ public class MainMemoryManager
 		if(currentIndex >= 0 && mainMemory[currentIndex] <= 0)
 		{
 			mainMemory[index] = 0;
-			currentIndex--;
 
-			if(mainMemory[currentIndex == 0])
+			//combine with empty tags
+			if(mainMemory[currentIndex] == 0)
 			{
-				//combine with empty tags
 				while(mainMemory[currentIndex] == 0)
 				{
 					currentIndex--;
@@ -45,6 +51,7 @@ public class MainMemoryManager
 				currentIndex++;
 			}
 
+			//combine with hole
 			else
 			{
 				counter++;
@@ -56,10 +63,13 @@ public class MainMemoryManager
 
 			index = currentIndex;
 			mainMemory[index] = counter;
-			currentIndex += counter + 1;
+			currentIndex += counter + 1; //move currentIndex to right side of block
 		}
 		else
-			currentIndex = index + mainMemory[index] + 1;
+		{
+			currentIndex = index + mainMemory[index] + 1; //move currentIndex to right side of block
+			mainMemory[index] *= -1;
+		}
 
 		//combine right
 		if(currentIndex == mainMemory.length - 1)
@@ -70,9 +80,10 @@ public class MainMemoryManager
 			if(mainMemory[currentIndex] <= 0)
 			{
 				mainMemory[currentIndex - 1] = 0;
-				if(mainMemory[currentIndex == 0])
+
+				//combine with empty tags
+				if(mainMemory[currentIndex] == 0)
 					{
-						//combine with empty tags
 						while(mainMemory[currentIndex] == 0)
 						{
 							currentIndex++;
@@ -80,7 +91,8 @@ public class MainMemoryManager
 						}
 						currentIndex--;
 					}
-	
+				
+				//combine with hole
 				else
 				{
 					counter++;
@@ -89,14 +101,13 @@ public class MainMemoryManager
 					currentIndex += toMove;
 					counter += toMove;
 				}
-				mainMemory[index] = counter;
+				mainMemory[index] = counter * -1;
 			}
 			else
 				currentIndex--;
 
-			mainMemory[currentIndex] = counter;
+			mainMemory[currentIndex] = counter * -1;
 		}
-
 		return index;
 	}
 
@@ -134,9 +145,25 @@ public class MainMemoryManager
 				i += move + 1;
 			}
 		}
-
 		return -1;
 	}
 
-
+	//TESTING ONLY
+	public void setMM(int[] mm)
+	{
+		mainMemory = mm;
+	}
+	
+	public void printMM()
+	{
+		System.out.print("[");
+		for(int i = 0; i < mainMemory.length; i++)
+		{
+			System.out.print(mainMemory[i]);
+			if(i == (mainMemory.length - 1))
+				System.out.print("]\n");
+			else
+				System.out.print(", ");
+		}
+	}
 }
