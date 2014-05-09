@@ -20,38 +20,46 @@ public class MainMemoryManager
 	{
 		//request block of n consecutive words
 		//return index of first usable word or error if insufficient mem
+		return firstFit(n);
 	}
 
 	public int mm_release(int index)
 	{
-		//releases previously requested block back to mm
-
-		//goto index
-		//if left is hole (or tag(s) only), combine them
-		//if right is hole (or tag(s) only), combine them
-
-		int counter = 0;
+		int counter = mainMemory[index];
 		int currentIndex = index - 1;
 
 		//combine left
 		if(currentIndex >= 0 && mainMemory[currentIndex] <= 0)
 		{
-			//combine with empty tags
-			while(mainMemory[currentIndex] == 0)
+			mainMemory[index] = 0;
+			currentIndex--;
+
+			if(mainMemory[currentIndex == 0])
 			{
-				currentIndex -= 1;
-				counter++;
+				//combine with empty tags
+				while(mainMemory[currentIndex] == 0)
+				{
+					currentIndex--;
+					counter++;
+				}
+				currentIndex++;
 			}
 
-			counter++;
-			int toMove = mainMemory[currentIndex] * -1 + 1;
-			mainMemory[currentIndex] = 0;
-			currentIndex -= toMove;
-			counter += toMove;
+			else
+			{
+				counter++;
+				int toMove = mainMemory[currentIndex] * -1 + 1;
+				mainMemory[currentIndex] = 0;
+				currentIndex -= toMove;
+				counter += toMove;
+			}
 
-			mainMemory[currentIndex] = counter;
+			index = currentIndex;
+			mainMemory[index] = counter;
 			currentIndex += counter + 1;
 		}
+		else
+			currentIndex = index + mainMemory[index] + 1;
 
 		//combine right
 		if(currentIndex == mainMemory.length - 1)
@@ -59,30 +67,37 @@ public class MainMemoryManager
 		else
 		{
 			currentIndex++;
-
-			//combine with empty tags
-			while(mainMemory[currentIndex] == 0)
+			if(mainMemory[currentIndex] <= 0)
 			{
-				currentIndex++;
-				counter++;
-			}
-
-			if(mainMemory[currentIndex] < 0)
-			{
-				counter++;
-				int toMove = mainMemory[currentIndex] * -1 + 1;
-				mainMemory[currentIndex] = 0;
-				currentIndex += toMove;
-				counter += toMove;
+				mainMemory[currentIndex - 1] = 0;
+				if(mainMemory[currentIndex == 0])
+					{
+						//combine with empty tags
+						while(mainMemory[currentIndex] == 0)
+						{
+							currentIndex++;
+							counter++;
+						}
+						currentIndex--;
+					}
+	
+				else
+				{
+					counter++;
+					int toMove = mainMemory[currentIndex] * -1 + 1;
+					mainMemory[currentIndex] = 0;
+					currentIndex += toMove;
+					counter += toMove;
+				}
+				mainMemory[index] = counter;
 			}
 			else
-			{
 				currentIndex--;
-				counter--;
-			}
 
 			mainMemory[currentIndex] = counter;
 		}
+
+		return index;
 	}
 
 	//iterates through memory array, giving the request the first block that fits. Returns -1 for no fit
