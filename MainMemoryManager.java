@@ -1,3 +1,7 @@
+import java.util.Arrays;
+
+import javax.naming.directory.InvalidAttributesException;
+
 public class MainMemoryManager 
 {
 	int[] mainMemory;
@@ -23,11 +27,25 @@ public class MainMemoryManager
 	}
 
 	//returns -1 for no fit
-	public int mm_request(int n)
+	public int mm_request(int n) //throws Exception
 	{
 		//request block of n consecutive words
 		//return index of first usable word or error if insufficient mem
-		return firstFit(n);
+		if(n <= 0)
+			return -1; //throw invalid input
+		if(strategy == Strategy.FIRST_FIT)
+			return firstFit(n);
+		else if(strategy == Strategy.BEST_FIT)
+			return bestFit(n);
+		else
+			return -1;//throw UnhandledStrategyException();
+	}
+	
+	
+
+	private Exception UnhandledStrategyException() {
+		System.out.println("ERROR: This strategy is not handled");
+		return null;
 	}
 
 	public int mm_release(int index)
@@ -146,6 +164,62 @@ public class MainMemoryManager
 			}
 		}
 		return -1;
+	}
+	
+	//iterates through memory array, giving the request the block that has the smallest difference in size. Returns -1 for no fit
+	private int bestFit(int n)
+	{
+		int index = 0;
+		int minDifference = Integer.MAX_VALUE;
+		int minIndex = -1;
+		
+		while(index < mainMemory.length)
+		{
+			//if free, check difference and go to next block
+			//else, go to next block
+			//return minDifference at the end
+			while(index < mainMemory.length && mainMemory[index] == 0)
+				index++;
+			if(index >= mainMemory.length)
+				return -1;
+			if(mainMemory[index] < 0)
+			{
+				int dif = mainMemory[index] * -1 - n;
+				if(dif >= 0 && dif < minDifference)
+				{
+					minDifference = dif;
+					minIndex = index;
+				}
+				index += mainMemory[index] * -1 + 2;
+			}
+			else
+				index += mainMemory[index] + 2;
+		}
+		
+		if(minIndex == -1 || minDifference < 0)
+			return -1;
+		
+		int rightSide = minIndex +  n + 1;
+		int newIndex = rightSide + 1;
+		mainMemory[minIndex] = n;
+		mainMemory[rightSide] = n;
+		
+		if(minDifference == 0) //if n perfectly fits in hole
+		{ }
+		else if(minDifference == 2 || minDifference == 1) //if remaining hole is not large enough to hold tags and memory
+		{
+			mainMemory[newIndex] = 0;
+			if(minDifference == 2)
+				mainMemory[newIndex + 1] = 0;
+		}
+		else
+		{
+			int newHole = (minDifference - 2) * -1;
+			mainMemory[newIndex] = newHole;
+			mainMemory[newIndex + (newHole * -1) + 1] = newHole;
+		}
+		
+		return minIndex;
 	}
 
 	//TESTING ONLY
