@@ -62,7 +62,7 @@ public class MainMemoryManager
 			}
 
 			index = currentIndex;
-			mainMemory[index] = counter;
+			mainMemory[index] = counter * -1;
 			currentIndex += counter + 1; //move currentIndex to right side of block
 		}
 		else
@@ -73,7 +73,7 @@ public class MainMemoryManager
 
 		//combine right
 		if(currentIndex == mainMemory.length - 1)
-			mainMemory[currentIndex] = counter;
+			mainMemory[currentIndex] = counter * -1;
 		else
 		{
 			currentIndex++;
