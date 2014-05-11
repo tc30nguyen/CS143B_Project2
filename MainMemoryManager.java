@@ -4,11 +4,13 @@ import javax.naming.directory.InvalidAttributesException;
 
 public class MainMemoryManager 
 {
-	int[] mainMemory;
-	Strategy strategy;
+	private int searchCount;
+	private int[] mainMemory;
+	private Strategy strategy;
 
 	public MainMemoryManager(Strategy s)
 	{
+		searchCount = 0;
 		mainMemory = null;
 		strategy = s;
 	}
@@ -39,14 +41,7 @@ public class MainMemoryManager
 			return bestFit(n);
 		else
 			return -1;//throw UnhandledStrategyException();
-	}
-	
-	
-
-	private Exception UnhandledStrategyException() {
-		System.out.println("ERROR: This strategy is not handled");
-		return null;
-	}
+	}		
 
 	public int mm_release(int index)
 	{
@@ -61,7 +56,7 @@ public class MainMemoryManager
 			//combine with empty tags
 			if(mainMemory[currentIndex] == 0)
 			{
-				while(mainMemory[currentIndex] == 0)
+				while(currentIndex >= 0 && mainMemory[currentIndex] == 0)
 				{
 					currentIndex--;
 					counter++;
@@ -102,7 +97,7 @@ public class MainMemoryManager
 				//combine with empty tags
 				if(mainMemory[currentIndex] == 0)
 					{
-						while(mainMemory[currentIndex] == 0)
+						while(currentIndex < mainMemory.length && mainMemory[currentIndex] == 0)
 						{
 							currentIndex++;
 							counter++;
@@ -134,6 +129,7 @@ public class MainMemoryManager
 	{
 		for(int i = 0; i < mainMemory.length; i++)
 		{
+			searchCount++;
 			if(mainMemory[i] * -1 >= n) //current hole can fit n
 			{
 				int difference = mainMemory[i] + n + 2; //calculate remaining space
@@ -178,8 +174,12 @@ public class MainMemoryManager
 			//if free, check difference and go to next block
 			//else, go to next block
 			//return minDifference at the end
+			searchCount++;
 			while(index < mainMemory.length && mainMemory[index] == 0)
+			{
 				index++;
+				searchCount++;
+			}
 			if(index >= mainMemory.length)
 				return -1;
 			if(mainMemory[index] < 0)
@@ -220,6 +220,21 @@ public class MainMemoryManager
 		}
 		
 		return minIndex;
+	}
+
+	public int getSearchCount()
+	{
+		return searchCount;
+	}
+
+	public void resetSearchCount()
+	{
+		searchCount = 0;
+	}
+
+	private Exception UnhandledStrategyException() {
+		System.out.println("ERROR: This strategy is not handled");
+		return null;
 	}
 
 	//TESTING ONLY
