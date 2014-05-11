@@ -4,33 +4,55 @@ import java.util.Random;
 
 public class Driver 
 {
-	double mem_utilization;
-	File output;
-	int mem_size;
-	int a; //average of gaus fnc
-	int d; //standard deviation of gaus fnc
-	final int sim_step = 10000; //how many requests/releases to run
-	int total_search_time;
-	LinkedList<Integer> allocatedBlocks;
-	Strategy strategy;
-	
-	public Driver(int mem_size, int a, int d, int sim_step, Strategy s)
+	private File output;
+	private int currentlyAllocated;
+	private int mem_size;
+	private final int sim_step = 10000; //how many requests/releases to run
+	private LinkedList<MemBlock> allocatedBlocks;
+	private MainMemoryManager mmm;
+	private Strategy strategy;
+
+	private class MemBlock
 	{
-		mem_utilization = 0.0;
+		private int index;
+		private int size;
+
+		public MemBlock(int index, int size)
+		{
+			this.index = index;
+			this.size = size;
+		}
+
+		public int getIndex()
+		{
+			return index;
+		}
+
+		public int getSize()
+		{
+			return size;
+		}
+	}
+	
+	public Driver(int mem_size)
+	{
 		output = new File("output");
+		currentlyAllocated = 0;
 		this.mem_size = mem_size;
-		a = 0;
-		d = 0;
-		total_search_time = 0;
 		allocatedBlocks = new LinkedList<>();
+		mmm = null;
 		strategy = null;
 	}
 	
-	public void runSim(int a, int d, Strategy s)
+	public void runSim(int avg, int stdDev, Strategy s)
 	{
-		this.a = a;
-		this.d = d;
+		double avg_mem_utilization = 0.0;
+		double avg_search_count = 0.0;
+		double mem_utilization = 0.0;
 		strategy = s;
+		
+		mmm = new MainMemoryManager(s);
+		mmm.mm_init(mem_size);
 		
 		//for sim_step, run request/release
 		//get avg mem utilization & search time
@@ -39,20 +61,47 @@ public class Driver
 			int index = -1;
 			do
 			{
-				index = mm_request(getRand); //request must count # holes examined for avg search
+				int requestSize = gauss(avg, stdDev);
+				index = mmm.mm_request(requestSize);
 				if(index != -1)
-					allocatedBlocks.add(index);
+				{
+					allocatedBlocks.add(new MemBlock(index, requestSize));
+					currentlyAllocated += requestSize;
+				}
 			}
-			while(index != -1)
+			while(index != -1);
 
-			//record mem utilization: add block sizes, divide by total mem size. computer average for all iterations
+			//record mem utilization
+			mem_utilization = ((double) currentlyAllocated) / ((double) mem_size);
+			avg_mem_utilization += mem_utilization;
+
 			//select block p tfrom allocatedBlocks to be released
-			//mm_release(p):
+			Random rand = new Random();
+			if(!allocatedBlocks.isEmpty())
+			{
+				int r = allocatedBlocks.size() > 1 ? rand.nextInt(allocatedBlocks.size() - 1) : 0;
+				MemBlock p = allocatedBlocks.get(r);
+				//mmm.printMM();
+				mmm.mm_release(p.getIndex());
+				allocatedBlocks.remove(p);
+				currentlyAllocated -= p.getSize();
+			}
 		}
+
+		avg_search_count = mmm.getSearchCount() / sim_step;
+		avg_mem_utilization /= sim_step;
+
+		System.out.println("Average search count: " + avg_search_count);
+		System.out.println("Average memory utilization" + avg_mem_utilization);
 	}
 	
-	private int getRand(int avg, int stdDev)
+	//returns a random int r with gaussian distribution where r > 0 and < max size
+	private int gauss(int avg, int stdDev)
 	{
-		return 0;
+		Random rand = new Random();
+		int r =  0;
+		while(r <= 0 || r > mem_size - 2)
+			r = (int) rand.nextGaussian() * stdDev + avg;
+		return r;
 	}
 }
