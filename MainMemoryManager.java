@@ -1,7 +1,3 @@
-import java.util.Arrays;
-
-import javax.naming.directory.InvalidAttributesException;
-
 public class MainMemoryManager 
 {
 	private int searchCount;
@@ -73,10 +69,11 @@ public class MainMemoryManager
 				currentIndex -= toMove;
 				counter += toMove;
 			}
-
+			
 			index = currentIndex;
 			mainMemory[index] = counter * -1;
 			currentIndex += counter + 1; //move currentIndex to right side of block
+			
 		}
 		else
 		{
@@ -155,7 +152,13 @@ public class MainMemoryManager
 			}
 			else //move the iterator to the next memory block
 			{
-				int move = mainMemory[i] > 0 ? mainMemory[i] : mainMemory[i] * -1;
+				int move = 0;
+				if(mainMemory[i] > 0)
+					move = mainMemory[i];
+				else if(mainMemory[i] == 0)
+					move--; //let i increment by 1
+				else
+					move = mainMemory[i] * -1;
 				i += move + 1;
 			}
 		}
@@ -230,11 +233,6 @@ public class MainMemoryManager
 	public void resetSearchCount()
 	{
 		searchCount = 0;
-	}
-
-	private Exception UnhandledStrategyException() {
-		System.out.println("ERROR: This strategy is not handled");
-		return null;
 	}
 
 	//TESTING ONLY
