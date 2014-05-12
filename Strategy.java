@@ -1,5 +1,6 @@
 
 public enum Strategy 
 {
-	FIRST_FIT, NEXT_FIT, BEST_FIT, WORST_FIT; 
+	FIRST_FIT, BEST_FIT;
+	//NEXT_FIT, WORST_FIT; 
 }
