@@ -1,16 +1,22 @@
 import java.util.LinkedList;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 public class Driver 
 {
-	private File output;
+	private BufferedWriter bw;
+	private FileWriter fw;
+	private File outputFile;
 	private int currentlyAllocated;
+	private int counter;
 	private int mem_size;
 	private final int sim_step = 10000; //how many requests/releases to run
 	private LinkedList<MemBlock> allocatedBlocks;
 	private MainMemoryManager mmm;
-	private Strategy strategy;
+	private StringBuilder output;
 
 	private class MemBlock
 	{
@@ -36,12 +42,13 @@ public class Driver
 	
 	public Driver(int mem_size)
 	{
-		output = new File("output");
 		currentlyAllocated = 0;
+		counter = 0;
 		this.mem_size = mem_size;
 		allocatedBlocks = new LinkedList<>();
 		mmm = null;
-		strategy = null;
+		output = new StringBuilder();
+		fileInit();
 	}
 	
 	public void runSim(int avg, int stdDev, Strategy s)
@@ -49,7 +56,6 @@ public class Driver
 		double avg_mem_utilization = 0.0;
 		double avg_search_count = 0.0;
 		double mem_utilization = 0.0;
-		strategy = s;
 		
 		mmm = new MainMemoryManager(s);
 		mmm.mm_init(mem_size);
@@ -93,6 +99,44 @@ public class Driver
 
 		System.out.println("Average search count: " + avg_search_count);
 		System.out.println("Average memory utilization" + avg_mem_utilization);
+		
+		output.append("Test " + counter + "\n");
+		output.append("Strategy = " + s.toString() + ", a = " + avg + ", d = " + stdDev + "\n");
+		output.append("Average search count: " + avg_search_count + "\n");
+		output.append("Average memory utilization" + avg_mem_utilization + "\n\n");
+		counter++;
+	}
+	
+	public void outputResults()
+	{
+		try {
+			bw.append(output);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void fileInit()
+	{
+		try
+		{
+			int fileNameCounter = 1;
+			do
+			{
+				outputFile = new File("output" + fileNameCounter);
+				fileNameCounter++;
+			}
+			while(outputFile.exists());
+			outputFile.createNewFile();
+			
+			fw = new FileWriter(outputFile.getAbsoluteFile());
+			bw = new BufferedWriter(fw);
+		}
+		catch (IOException e)
+		{
+			System.out.println("IOException: " + e.getMessage());
+		}
 	}
 	
 	//returns a random int r with gaussian distribution where r > 0 and < max size
