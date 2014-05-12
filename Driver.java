@@ -45,7 +45,7 @@ public class Driver
 		currentlyAllocated = 0;
 		counter = 0;
 		this.mem_size = mem_size;
-		allocatedBlocks = new LinkedList<>();
+		allocatedBlocks = null;
 		mmm = null;
 		output = new StringBuilder();
 		fileInit();
@@ -57,6 +57,7 @@ public class Driver
 		double avg_search_count = 0.0;
 		double mem_utilization = 0.0;
 		
+		allocatedBlocks = new LinkedList<>();
 		mmm = new MainMemoryManager(s);
 		mmm.mm_init(mem_size);
 		
@@ -103,16 +104,19 @@ public class Driver
 		output.append("Test " + counter + "\n");
 		output.append("Strategy = " + s.toString() + ", a = " + avg + ", d = " + stdDev + "\n");
 		output.append("Average search count: " + avg_search_count + "\n");
-		output.append("Average memory utilization" + avg_mem_utilization + "\n\n");
+		output.append("Average memory utilization: " + avg_mem_utilization + "\n\n");
 		counter++;
 	}
 	
 	public void outputResults()
 	{
-		try {
+		try 
+		{
 			bw.append(output);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			bw.close();
+		} 
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
@@ -124,7 +128,7 @@ public class Driver
 			int fileNameCounter = 1;
 			do
 			{
-				outputFile = new File("output" + fileNameCounter);
+				outputFile = new File("output" + fileNameCounter + ".txt");
 				fileNameCounter++;
 			}
 			while(outputFile.exists());
