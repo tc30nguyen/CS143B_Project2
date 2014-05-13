@@ -44,11 +44,13 @@ public class Driver
 		this.mem_size = mem_size;
 		mmm = null;
 		output = new StringBuilder();
+		output.append("For mem_size " + mem_size + "\n");
 		fileInit();
 	}
 	
 	public void runSim(int avg, int stdDev, Strategy s)
 	{
+		System.out.println("Running simulation with a=" + avg + ", d=" + stdDev + ", and " + s.toString() + " strategy");
 		double avg_mem_utilization = 0.0;
 		double avg_search_count = 0.0;
 		double mem_utilization = 0.0;
@@ -111,6 +113,7 @@ public class Driver
 		{
 			bw.append(output);
 			bw.close();
+			System.out.println("Results output to " + outputFile.getName());
 		} 
 		catch (IOException e)
 		{
