@@ -234,23 +234,4 @@ public class MainMemoryManager
 	{
 		searchCount = 0;
 	}
-
-	//TESTING ONLY
-	public void setMM(int[] mm)
-	{
-		mainMemory = mm;
-	}
-	
-	public void printMM()
-	{
-		System.out.print("[");
-		for(int i = 0; i < mainMemory.length; i++)
-		{
-			System.out.print(mainMemory[i]);
-			if(i == (mainMemory.length - 1))
-				System.out.print("]\n");
-			else
-				System.out.print(", ");
-		}
-	}
 }
