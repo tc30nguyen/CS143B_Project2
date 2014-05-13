@@ -44,7 +44,7 @@ public class Driver
 		this.mem_size = mem_size;
 		mmm = null;
 		output = new StringBuilder();
-		output.append("For mem_size " + mem_size + "\n");
+		output.append("For mem_size " + mem_size + " and sim_step " + sim_step + "\n");
 		fileInit();
 	}
 	
