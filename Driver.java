@@ -10,11 +10,9 @@ public class Driver
 	private BufferedWriter bw;
 	private FileWriter fw;
 	private File outputFile;
-	private int currentlyAllocated;
 	private int counter;
 	private int mem_size;
 	private final int sim_step = 10000; //how many requests/releases to run
-	private LinkedList<MemBlock> allocatedBlocks;
 	private MainMemoryManager mmm;
 	private StringBuilder output;
 
@@ -42,10 +40,8 @@ public class Driver
 	
 	public Driver(int mem_size)
 	{
-		currentlyAllocated = 0;
 		counter = 0;
 		this.mem_size = mem_size;
-		allocatedBlocks = null;
 		mmm = null;
 		output = new StringBuilder();
 		fileInit();
@@ -57,7 +53,8 @@ public class Driver
 		double avg_search_count = 0.0;
 		double mem_utilization = 0.0;
 		
-		allocatedBlocks = new LinkedList<>();
+		LinkedList<MemBlock> allocatedBlocks = new LinkedList<>();
+		int currentlyAllocated = 0;
 		mmm = new MainMemoryManager(s);
 		mmm.mm_init(mem_size);
 		
@@ -82,7 +79,7 @@ public class Driver
 			mem_utilization = ((double) currentlyAllocated) / ((double) mem_size);
 			avg_mem_utilization += mem_utilization;
 
-			//select block p tfrom allocatedBlocks to be released
+			//select block p from allocatedBlocks to be released
 			Random rand = new Random();
 			if(!allocatedBlocks.isEmpty())
 			{
@@ -95,11 +92,11 @@ public class Driver
 			}
 		}
 
-		avg_search_count = mmm.getSearchCount() / sim_step;
-		avg_mem_utilization /= sim_step;
+		avg_search_count = (double) mmm.getSearchCount() / (double) sim_step;
+		avg_mem_utilization /= (double) sim_step;
 
-		System.out.println("Average search count: " + avg_search_count);
-		System.out.println("Average memory utilization" + avg_mem_utilization);
+		//System.out.println("Average search count: " + avg_search_count);
+		//System.out.println("Average memory utilization: " + avg_mem_utilization);
 		
 		output.append("Test " + counter + "\n");
 		output.append("Strategy = " + s.toString() + ", a = " + avg + ", d = " + stdDev + "\n");
