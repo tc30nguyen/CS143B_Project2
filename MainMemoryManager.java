@@ -154,7 +154,10 @@ public class MainMemoryManager
 			{
 				int move = 0;
 				if(mainMemory[i] > 0)
+				{
+					searchCount--; //not a hole, do not increment searchCount
 					move = mainMemory[i];
+				}
 				else if(mainMemory[i] == 0)
 					move--; //let i increment by 1
 				else
@@ -172,19 +175,24 @@ public class MainMemoryManager
 		int minDifference = Integer.MAX_VALUE;
 		int minIndex = -1;
 		
+		//if free, check difference and go to next block
+		//else, go to next block
+		//return minDifference at the end
 		while(index < mainMemory.length)
 		{
-			//if free, check difference and go to next block
-			//else, go to next block
-			//return minDifference at the end
 			searchCount++;
+			
+			//at tagless hole, keep iterating
 			while(index < mainMemory.length && mainMemory[index] == 0)
 			{
 				index++;
 				searchCount++;
 			}
+			
 			if(index >= mainMemory.length)
 				return -1;
+			
+			//if at hole
 			if(mainMemory[index] < 0)
 			{
 				int dif = mainMemory[index] * -1 - n;
@@ -195,8 +203,13 @@ public class MainMemoryManager
 				}
 				index += mainMemory[index] * -1 + 2;
 			}
+			
+			//if at allocated block
 			else
+			{
+				searchCount--; //not a hole, do not increment search count
 				index += mainMemory[index] + 2;
+			}
 		}
 		
 		if(minIndex == -1 || minDifference < 0)
@@ -204,6 +217,8 @@ public class MainMemoryManager
 		
 		int rightSide = minIndex +  n + 1;
 		int newIndex = rightSide + 1;
+		
+		//set tags at newly allocated block
 		mainMemory[minIndex] = n;
 		mainMemory[rightSide] = n;
 		
